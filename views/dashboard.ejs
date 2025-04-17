@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord</title>
+</head>
+<body>
+  <h1>Bienvenue, <%= user.username %></h1>
+  <p>Email: <%= user.email %></p>
+  <p>Date: <%= new Date().toLocaleDateString() %></p>
+  <h2>Réservations en cours</h2>
+  <!-- Liste des réservations -->
+  <table>
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Bateau</th>
+        <th>Catway</th>
+        <th>Date de début</th>
+        <th>Date de fin</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% reservations.forEach(reservation => { %>
+        <tr>
+          <td><%= reservation.clientName %></td>
+          <td><%= reservation.boatName %></td>
+          <td><%= reservation.catwayNumber %></td>
+          <td><%= reservation.startDate.toLocaleDateString() %></td>
+          <td><%= reservation.endDate.toLocaleDateString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <a href="/logout">Se déconnecter</a>
+</body>
+</html>
