@@ -1,22 +1,28 @@
 const express = require('express');
 const Reservation = require('../models/Reservation');
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
 
-// Créer une réservation
-router.post('/:id/reservations', async (req, res) => {
-  const { clientName, boatName, startDate, endDate } = req.body;
+
+// 🔐 Créer une nouvelle réservation
+router.post("/", authMiddleware, async (req, res) => {
+  const { catwayNumber, clientName, boatName, startDate, endDate } = req.body;
+
   try {
     const reservation = new Reservation({
-      catwayNumber: req.params.id,
+      catwayNumber,
       clientName,
       boatName,
       startDate,
-      endDate
+      endDate,
+      userId: req.user._id  // 👈 Lien avec l'utilisateur connecté
     });
+
     await reservation.save();
-    res.status(201).json(reservation);
+    res.status(201).json({ message: "Réservation créée avec succès", reservation });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur lors de la création de la réservation" });
   }
 });
 

@@ -1,16 +1,28 @@
+<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Accueil - Port de Plaisance Russell</title>
+  <title>Bienvenue à l'API du Port Russel</title>
 </head>
 <body>
-  <h1>Bienvenue au Port de Plaisance de Russell</h1>
+  <h1>Bienvenue à l'API du Port Russel 🚤</h1>
+  <p>Une plateforme pour gérer les catways et les réservations de bateaux.</p>
+
+  <!-- Formulaire de connexion -->
   <form action="/login" method="POST">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
+    <label for="email">Email :</label>
+    <input type="email" name="email" required>
+    <br>
+    <label for="password">Mot de passe :</label>
+    <input type="password" name="password" required>
+    <br>
     <button type="submit">Se connecter</button>
   </form>
-  <p><a href="/docs">Accéder à la documentation API</a></p>
+
+  <br>
+  <!-- Lien vers la documentation de l'API -->
+  <a href="/docs">Voir la documentation de l'API</a>
 </body>
 </html>
+

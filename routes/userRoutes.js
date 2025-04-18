@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/authMiddleware");  // Import du middleware
-
+const userController = require("../controllers/userController");
 
 
 // Créer un utilisateur
@@ -119,5 +119,6 @@ router.get("/logout", (req, res) => {
   // La déconnexion sera gérée côté client (par suppression du token)
   res.json({ message: "Logged out successfully" });
 });
+
 
 module.exports = router;

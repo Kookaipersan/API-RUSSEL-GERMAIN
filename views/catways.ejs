@@ -1,0 +1,32 @@
+<!-- views/catways.ejs -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Catways</title>
+</head>
+<body>
+  <h1>Tous les Catways</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Numéro du Catway</th>
+        <th>Nom</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% catways.forEach(catway => { %>
+        <tr>
+          <td><%= catway.catwayNumber %></td>
+          <td><%= catway.name %></td>
+          <td>
+            <a href="/catways/<%= catway._id %>/edit">Modifier</a>
+            <a href="/catways/<%= catway._id %>/delete">Supprimer</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
