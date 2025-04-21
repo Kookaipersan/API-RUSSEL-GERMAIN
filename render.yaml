@@ -1,0 +1,15 @@
+# render.yaml
+services:
+  - type: web
+    name: api-russel-germain
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        fromEnvVar: MONGODB_URI
+      - key: JWT_SECRET
+        fromEnvVar: JWT_SECRET
+      - key: PORT
+        value: 3000
