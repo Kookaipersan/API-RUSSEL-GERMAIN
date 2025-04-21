@@ -1,0 +1,7 @@
+# Ignorer les fichiers sensibles et inutiles
+.env
+node_modules/
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/
