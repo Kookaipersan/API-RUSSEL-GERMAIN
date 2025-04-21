@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+
+<h1>Liste des Réservations</h1>
+<a href="/reservations/create">Créer une réservation</a>
+<table>
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Catway Number</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% reservations.forEach(reservation => { %>
+            <tr>
+                <td>
+                    <%= reservation.clientName %>
+                </td>
+                <td>
+                    <%= reservation.catwayNumber %>
+                </td>
+                <td>
+                    <%= reservation.startDate %>
+                </td>
+                <td>
+                    <%= reservation.endDate %>
+                </td>
+                <td>
+                    <a href="/reservations/<%= reservation._id %>">Voir</a>
+                    <a href="/reservations/<%= reservation._id %>/edit">Éditer</a>
+
+                    <!-- Formulaire pour supprimer -->
+                    <form action="/reservations/<%= reservation._id %>?_method=DELETE" method="POST" style="display:inline;">
+                        <button type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+<%- include('../partials/footer') %>

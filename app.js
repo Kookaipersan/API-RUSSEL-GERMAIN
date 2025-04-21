@@ -7,9 +7,8 @@ const methodOverride = require("method-override");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const cors = require("cors");
-const path = require('path');
-const authMiddleware = require('./middleware/authMiddleware');  // Ajuste le chemin si nécessaire
-
+const path = require("path");
+const authMiddleware = require("./middleware/authMiddleware"); // Ajuste le chemin si nécessaire
 
 const catwayRoutes = require("./routes/catwayRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
@@ -26,83 +25,114 @@ const app = express();
 // Middlewares
 app.use(morgan("dev"));
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(methodOverride("_method"));
 
+// Désactiver le cache pour toutes les réponses
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
+
 // Routes
 app.use("/catways", catwayRoutes);
-app.use('/catways/:id/reservations', reservationRoutes); // Réservations sous catwayId spécifique
+app.use("/reservations", reservationRoutes); // Utilise directement /reservations
 app.use("/users", userRoutes);
 app.use("/dashboard", dashboardRoutes);
-
 
 // View engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Route test
+// // Route test
+// app.get("/", (req, res) => {
+//   res.send("Bienvenue à l'API du Port Russell ");
+// });
+
+// Page d'accueil avec formulaire de connexion
 app.get("/", (req, res) => {
-  res.send("Bienvenue à l'API du Port Russell ");
+  res.render("index", { title: "Accueil", user: req.user || null });
 });
 
-// Page d'accueil (connexion)
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
-//Route pour afficher le dashboard
-app.get("/dashboard", authMiddleware, async (req, res) => {
+//Page pour les catways
+app.get("/catways", authMiddleware, async (req, res) => {
   try {
-    const reservations = await Reservation.find({ userId: req.user._id });
-    const catways = await Catway.find(); // si tu veux aussi afficher les catways
+    const catways = await Catway.find();
+    res.render("catways/list", { catways, title: "Liste des Catways" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors de la récupération des catways");
+  }
+});
 
-    res.render("dashboard", {
-      user: req.user,
+app.get("/reservations", authMiddleware, async (req, res) => {
+  try {
+    const reservations = await Reservation.find();
+    res.render("reservations/list", {
+      title: "Liste des Réservations",
       reservations,
-      catways,
-      date: new Date().toLocaleDateString("fr-FR"),
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur lors du chargement du dashboard");
+    res.status(500).send("Erreur lors de la récupération des réservations");
   }
 });
- 
+
+app.get("/users", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.render("users/list", { title: "Liste des Utilisateurs", users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors de la récupération des utilisateurs");
+  }
+});
+
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.redirect("/", { title: "Déconnexion - Port Russel" });
+});
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
-  });
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
-  app.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-  
-    try {
-      const user = await User.findOne({ email });
-      if (!user || !(await user.matchPassword(password))) {
-        return res.status(401).render("index", { error: "Email ou mot de passe invalide." });
-      }
-  
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
-  
-      // On stocke le token dans un cookie (pour frontend EJS, pratique)
-      res.cookie("token", token, {
-        httpOnly: true,
-        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 jours
-      });
-  
-      res.redirect("/dashboard");
-    } catch (err) {
-      res.status(500).send("Erreur serveur");
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !(await user.matchPassword(password))) {
+      return res
+        .status(401)
+        .render("index", {
+          error: "Email ou mot de passe invalide.",
+          title: "Connexion - Port Russel",
+        });
     }
-  });
-  app.get("/logout", (req, res) => {
-    res.clearCookie("token");
-    res.redirect("/");
-  });
 
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "3d",
+    });
+
+    // Stocke le token dans un cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 jours
+    });
+
+    res.redirect("/dashboard");
+  } catch (err) {
+    res.status(500).send("Erreur serveur");
+  }
+});
 
 // Lancement du serveur
 const PORT = parseInt(process.env.PORT, 10) || 3000;

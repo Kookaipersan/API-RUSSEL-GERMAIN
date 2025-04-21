@@ -3,11 +3,14 @@ const Reservation = require('../models/Reservation');
 const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 
+// 📝 Formulaire de création
+router.get("/create", authMiddleware, (req, res) => {
+  res.render("reservations/create");
+});
 
 // 🔐 Créer une nouvelle réservation
 router.post("/", authMiddleware, async (req, res) => {
   const { catwayNumber, clientName, boatName, startDate, endDate } = req.body;
-
   try {
     const reservation = new Reservation({
       catwayNumber,
@@ -15,69 +18,68 @@ router.post("/", authMiddleware, async (req, res) => {
       boatName,
       startDate,
       endDate,
-      userId: req.user._id  // 👈 Lien avec l'utilisateur connecté
+      userId: req.user._id
     });
-
     await reservation.save();
     res.status(201).json({ message: "Réservation créée avec succès", reservation });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur serveur lors de la création de la réservation" });
+    res.status(500).json({ error: "Erreur serveur lors de la création" });
   }
 });
 
-// Lister les réservations d'un catway
-router.get('/:id/reservations', async (req, res) => {
+// 📋 Liste des réservations
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const reservations = await Reservation.find({ catwayNumber: req.params.id });
-    res.json(reservations);
+    const reservations = await Reservation.find();
+    res.render("reservations/list", { reservations, title: "Liste des réservations" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).send("Erreur lors du chargement des réservations");
   }
 });
 
-// Récupérer une réservation spécifique
-router.get('/:id/reservations/:reservationId', async (req, res) => {
+// 🔍 Voir une réservation
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.reservationId);
-    if (!reservation) {
-      return res.status(404).json({ message: 'Reservation not found' });
-    }
-    res.json(reservation);
+    const reservation = await Reservation.findById(req.params.id)
+      .populate("userId")
+      .populate("catwayId");
+    if (!reservation) return res.status(404).send("Réservation non trouvée");
+    res.render("reservations/view", { reservation, title: "Détails de la réservation" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).send("Erreur serveur");
   }
 });
 
-// Modifier une réservation
-router.put('/:id/reservations/:reservationId', async (req, res) => {
+// ✏️ Formulaire d'édition
+router.get("/:id/edit", authMiddleware, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.reservationId);
-    if (!reservation) {
-      return res.status(404).json({ message: 'Reservation not found' });
-    }
-    reservation.clientName = req.body.clientName || reservation.clientName;
-    reservation.boatName = req.body.boatName || reservation.boatName;
-    reservation.startDate = req.body.startDate || reservation.startDate;
-    reservation.endDate = req.body.endDate || reservation.endDate;
-    await reservation.save();
-    res.json(reservation);
+    const reservation = await Reservation.findById(req.params.id);
+    if (!reservation) return res.status(404).send("Réservation non trouvée");
+    res.render("reservations/edit", { reservation, title: "Modifier la réservation" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).send("Erreur serveur");
   }
 });
 
-// Supprimer une réservation
-router.delete('/:id/reservations/:reservationId', async (req, res) => {
+// 💾 Mise à jour
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.reservationId);
-    if (!reservation) {
-      return res.status(404).json({ message: 'Reservation not found' });
-    }
-    await reservation.remove();
-    res.json({ message: 'Reservation deleted' });
+    await Reservation.findByIdAndUpdate(req.params.id, req.body);
+    res.redirect("/reservations");
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).send("Erreur lors de la mise à jour");
+  }
+});
+
+// 🗑️ Suppression
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    await Reservation.findByIdAndDelete(req.params.id);
+    res.redirect('/reservations');
+  } catch (err) {
+    res.status(500).send('Erreur lors de la suppression');
   }
 });
 

@@ -36,14 +36,23 @@ router.post("/register", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.render("users/list", { users, title: "Liste des utilisateurs" }); // 
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+router.get('/:id/edit', userController.editUserForm);
+router.post('/:id/edit', userController.updateUser); // ou PUT si tu fais via AJAX ou form méthode PUT
+router.get('/:id', userController.viewUser);
+router.post('/:id/delete', userController.deleteUser); // ou DELETE si AJAX
+
+
+
+
+
 // Récupérer un utilisateur par son email
-router.get("/:email", async (req, res) => {
+router.get("/email/:email", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.params.email });
     if (!user) {
@@ -56,7 +65,7 @@ router.get("/:email", async (req, res) => {
 });
 
 // Modifier un utilisateur
-router.put("/:email", auth, async (req, res) => {
+router.put("/email/:email", auth, async (req, res) => {
   try {
     const user = await User.findOne({ email: req.params.email });
     if (!user) {
@@ -75,7 +84,7 @@ router.put("/:email", auth, async (req, res) => {
 });
 
 // Supprimer un utilisateur
-router.delete("/:email", auth, async (req, res) => {
+router.delete("/email/:email", auth, async (req, res) =>{
   try {
     const user = await User.findOne({ email: req.params.email });
     if (!user) {
@@ -88,7 +97,7 @@ router.delete("/:email", auth, async (req, res) => {
   }
 });
 
-// Connexion d'un utilisateur
+// Route pour connecter un utilisateur
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   console.log('Tentative de login pour :', email);
@@ -96,13 +105,13 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       console.log('Utilisateur non trouvé');
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Email ou mot de passe invalide' });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       console.log('Mot de passe incorrect');
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Email ou mot de passe invalide' });
     }
 
     const token = user.generateAuthToken();
@@ -113,12 +122,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/:id', userController.viewUser);
 
 // Déconnexion d'un utilisateur (logique simple pour déconnexion)
 router.get("/logout", (req, res) => {
   // La déconnexion sera gérée côté client (par suppression du token)
   res.json({ message: "Logged out successfully" });
 });
+
+
+
+router.delete('/:id', userController.deleteUser);
 
 
 module.exports = router;

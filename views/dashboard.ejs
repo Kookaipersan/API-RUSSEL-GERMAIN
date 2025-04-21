@@ -1,37 +1,51 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Tableau de bord</title>
-</head>
-<body>
-  <h1>Bienvenue, <%= user.username %></h1>
-  <p>Email: <%= user.email %></p>
-  <p>Date: <%= new Date().toLocaleDateString() %></p>
-  <h2>Réservations en cours</h2>
-  <!-- Liste des réservations -->
-  <table>
-    <thead>
-      <tr>
-        <th>Client</th>
-        <th>Bateau</th>
-        <th>Catway</th>
-        <th>Date de début</th>
-        <th>Date de fin</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% reservations.forEach(reservation => { %>
-        <tr>
-          <td><%= reservation.clientName %></td>
-          <td><%= reservation.boatName %></td>
-          <td><%= reservation.catwayNumber %></td>
-          <td><%= reservation.startDate.toLocaleDateString() %></td>
-          <td><%= reservation.endDate.toLocaleDateString() %></td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
-  <a href="/logout">Se déconnecter</a>
-</body>
-</html>
+<%- include('partials/header') %>
+
+    <h2>Tableau de bord</h2>
+    <p>👤 Utilisateur : <strong>
+            <%= user.username %>
+        </strong></p>
+    <p>📧 Email : <%= user.email %>
+    </p>
+    <p>📅 Date : <%= date %>
+    </p>
+
+    <h3 class="mt-4">Réservations en cours</h3>
+
+    <% if (reservations.length> 0) { %>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Client</th>
+                    <th>Bateau</th>
+                    <th>Catway</th>
+                    <th>Date de début</th>
+                    <th>Date de fin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% reservations.forEach(res=> { %>
+                    <tr>
+                        <td>
+                            <%= res.clientName || "Inconnu" %>
+                        </td>
+                        <td>
+                            <%= res.boatName || "Inconnu" %>
+                        </td>
+                        <td>
+                            <%= res.catwayId ? res.catwayId.catwayNumber : "Non spécifié" %>
+                        </td> <!-- Affichage du catwayNumber -->
+                        <td>
+                            <%= new Date(res.startDate).toLocaleDateString('fr-FR') %>
+                        </td>
+                        <td>
+                            <%= new Date(res.endDate).toLocaleDateString('fr-FR') %>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+        <% } else { %>
+            <p>Aucune réservation en cours.</p>
+            <% } %>
+
+                <%- include('partials/footer') %>

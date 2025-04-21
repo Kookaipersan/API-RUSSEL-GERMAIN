@@ -1,0 +1,14 @@
+<%- include('../partials/header') %>
+
+<h1>Modifier Catway</h1>
+<form action="/catways/<%= catway._id %>?_method=PUT" method="POST">
+  <label>Nom :</label>
+  <input type="text" name="nom" value="<%= catway.nom %>" required>
+  <br>
+  <!-- Ajoute d'autres champs si besoin -->
+  <button type="submit">Enregistrer</button>
+</form>
+
+<a href="/catways">Annuler</a>
+
+<%- include('../partials/footer') %>

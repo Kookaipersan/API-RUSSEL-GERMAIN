@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+
+<h1>Détails de la réservation</h1>
+<p><strong>Utilisateur :</strong> <%= reservation.userId.username %></p> <!-- Assure-toi que 'userId' est correct -->
+<p><strong>Catway :</strong> <%= reservation.catwayId ? reservation.catwayId.nom : 'Non défini' %></p>
+<p><strong>Date de début :</strong> <%= reservation.startDate.toLocaleDateString() %></p>
+<p><strong>Date de fin :</strong> <%= reservation.endDate.toLocaleDateString() %></p>
+
+<a href="/reservations/<%= reservation._id %>/edit">Modifier</a>
+<a href="/reservations">Retour à la liste</a>
+
+<%- include('../partials/footer') %>

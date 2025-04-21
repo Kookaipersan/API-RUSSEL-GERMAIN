@@ -1,28 +1,63 @@
-<!-- views/index.ejs -->
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Bienvenue à l'API du Port Russel</title>
-</head>
-<body>
-  <h1>Bienvenue à l'API du Port Russel 🚤</h1>
-  <p>Une plateforme pour gérer les catways et les réservations de bateaux.</p>
+<%- include('partials/header') %>
 
-  <!-- Formulaire de connexion -->
-  <form action="/login" method="POST">
-    <label for="email">Email :</label>
-    <input type="email" name="email" required>
-    <br>
-    <label for="password">Mot de passe :</label>
-    <input type="password" name="password" required>
-    <br>
-    <button type="submit">Se connecter</button>
+<div class="container mt-4">
+  <h1 class="mb-4">Bienvenue à l'API du Port Russel</h1>
+  <p class="lead">Gérez les catways, les réservations et les utilisateurs de notre port de plaisance en toute simplicité.</p>
+
+  <!-- Formulaire d'enregistrement -->
+  <h2>Créer un utilisateur</h2>
+  <form action="/users/register" method="POST">
+    <div class="mb-3">
+      <label for="username" class="form-label">Nom d'utilisateur</label>
+      <input type="text" class="form-control" id="username" name="username" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Mot de passe</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-success">Créer le profil</button>
   </form>
 
-  <br>
-  <!-- Lien vers la documentation de l'API -->
-  <a href="/docs">Voir la documentation de l'API</a>
-</body>
-</html>
+  <!-- Formulaire de connexion (géré côté JS) -->
+  <h2 class="mt-5">Se connecter</h2>
+  <form id="login-form">
+    <div class="mb-3">
+      <label for="login-email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="login-email" required>
+    </div>
+    <div class="mb-3">
+      <label for="login-password" class="form-label">Mot de passe</label>
+      <input type="password" class="form-control" id="login-password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Se connecter</button>
+  </form>
+</div>
 
+<!-- Axios + JS -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    try {
+      const response = await axios.post('/users/login', { email, password });
+
+      // ✅ Stocker le token dans un cookie (path=/ pour qu’il soit accessible partout)
+      document.cookie = `token=${response.data.token}; path=/`;
+
+      // Rediriger vers tableau de bord ou autre page protégée
+      window.location.href = '/dashboard';
+    } catch (err) {
+      alert('Erreur de connexion : ' + (err.response?.data?.message || 'Vérifie tes identifiants'));
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>

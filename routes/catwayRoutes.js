@@ -1,82 +1,68 @@
+// routes/catwayRoutes.js
 const express = require('express');
 const Catway = require('../models/Catway');
-const auth = require("../middleware/authMiddleware"); // Importer le middleware d'authentification
+const auth = require("../middleware/authMiddleware");
 const router = express.Router();
-
-
-// Exemple de route protégée
-router.get("/", auth, async (req, res) => {
-    try {
-      const catways = await Catway.find();
-      res.status(200).send(catways);
-    } catch (err) {
-      res.status(500).send({ error: "Erreur lors de la récupération des catways" });
-    }
-  });
-
-
-// Créer un catway
-router.post('/', async (req, res) => {
-  const { catwayNumber, catwayType, catwayState } = req.body;
-  try {
-    const newCatway = new Catway({ catwayNumber, catwayType, catwayState });
-    await newCatway.save();
-    res.status(201).json(newCatway);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+const catwayController = require('../controllers/catwayController');
 
 // Lister tous les catways
 router.get('/', async (req, res) => {
-  try {
     const catways = await Catway.find();
-    res.json(catways);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Récupérer un catway par son numéro
-router.get('/:id', async (req, res) => {
-  try {
-    const catway = await Catway.findOne({ catwayNumber: req.params.id });
-    if (!catway) {
-      return res.status(404).json({ message: 'Catway not found' });
+    res.render('catways/list', { catways, title: "Liste des Catways" });
+  });
+  
+  // Voir un catway
+  router.get('/:id', async (req, res) => {
+    try {
+      const catway = await Catway.findById(req.params.id);
+      if (!catway) return res.status(404).send('Catway introuvable');
+      res.render('catways/view', { catway, title: "Détails du Catway" });
+    } catch (err) {
+      res.status(500).send('Something went wrong');
     }
-    res.json(catway);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Mettre à jour l'état d'un catway
-router.put('/:id', async (req, res) => {
-  try {
-    const catway = await Catway.findOne({ catwayNumber: req.params.id });
-    if (!catway) {
-      return res.status(404).json({ message: 'Catway not found' });
+  });
+  
+  // Formulaire de modification
+  router.get('/:id/edit', async (req, res) => {
+    try {
+      const catway = await Catway.findById(req.params.id);
+      if (!catway) return res.status(404).send('Catway introuvable');
+      res.render('catways/edit', { catway, title: "Modifier le Catway" });
+    } catch (err) {
+      res.status(500).send('Erreur serveur');
     }
-    catway.catwayState = req.body.catwayState || catway.catwayState;
-    await catway.save();
-    res.json(catway);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+  });
+  
+  // Enregistrer la modification
+  router.post('/:id/edit', async (req, res) => {
+    try {
+      await Catway.findByIdAndUpdate(req.params.id, req.body);
+      res.redirect('/catways');
+    } catch (err) {
+      res.status(500).send('Erreur lors de la mise à jour');
+    }
+  });
+  
+  // Supprimer un catway
+  router.post('/:id/delete', async (req, res) => {
+    try {
+      await Catway.findByIdAndDelete(req.params.id);
+      res.redirect('/catways');
+    } catch (err) {
+      res.status(500).send('Erreur lors de la suppression du catway');
+    }
+  });
 
 // Supprimer un catway
 router.delete('/:id', async (req, res) => {
-  try {
-    const catway = await Catway.findOne({ catwayNumber: req.params.id });
-    if (!catway) {
-      return res.status(404).json({ message: 'Catway not found' });
+    try {
+      await Catway.findByIdAndDelete(req.params.id);
+      res.redirect('/catways');
+    } catch (err) {
+      console.error('Erreur lors de la suppression du catway', err);
+      res.status(500).send('Erreur lors de la suppression du catway');
     }
-    await catway.remove();
-    res.json({ message: 'Catway deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+  });
 
-module.exports = router;
+  
+  module.exports = router;

@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+
+<h2><%= catway ? 'Modifier' : 'Ajouter' %> un Catway</h2>
+
+<form action="<%= catway ? '/catways/' + catway._id : '/catways' %>" method="POST">
+  <div class="mb-3">
+    <label for="catwayNumber" class="form-label">Numéro du Catway</label>
+    <input type="number" class="form-control" id="catwayNumber" name="catwayNumber" value="<%= catway ? catway.catwayNumber : '' %>" readonly required>
+  </div>
+  
+  <div class="mb-3">
+    <label for="catwayType" class="form-label">Type du Catway</label>
+    <input type="text" class="form-control" id="catwayType" name="catwayType" value="<%= catway ? catway.catwayType : '' %>" readonly required>
+  </div>
+
+  <div class="mb-3">
+    <label for="catwayState" class="form-label">État du Catway</label>
+    <input type="text" class="form-control" id="catwayState" name="catwayState" value="<%= catway ? catway.catwayState : '' %>" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary"><%= catway ? 'Mettre à jour' : 'Ajouter' %></button>
+</form>
+
+<%- include('../partials/footer') %>

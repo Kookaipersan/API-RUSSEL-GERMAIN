@@ -34,3 +34,41 @@ exports.login = async (req, res) => {
     res.status(500).render("index", { error: "Erreur serveur" });
   }
 };
+
+exports.viewUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send('Utilisateur non trouvé');
+    res.render('users/view', { user, title: 'Détail utilisateur' });
+  } catch (err) {
+    res.status(500).send('Erreur serveur');
+  }
+};
+
+exports.editUserForm = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send('Utilisateur non trouvé');
+    res.render('users/edit', { user, title: 'Modifier utilisateur' });
+  } catch (err) {
+    res.status(500).send('Erreur serveur');
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.params.id, req.body);
+    res.redirect('/users');
+  } catch (err) {
+    res.status(500).send('Erreur serveur');
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.redirect('/users');
+  } catch (err) {
+    res.status(500).send('Erreur serveur');
+  }
+};

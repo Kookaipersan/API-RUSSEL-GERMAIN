@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+
+<h1>Modifier la réservation</h1>
+<form action="/reservations/<%= reservation._id %>?_method=PUT" method="POST">
+  <label for="startDate">Date de début :</label>
+  <input type="date" name="startDate" value="<%= reservation.startDate.toISOString().slice(0, 10) %>">
+  <br>
+
+  <label for="endDate">Date de fin :</label>
+  <input type="date" name="endDate" value="<%= reservation.endDate.toISOString().slice(0, 10) %>">
+  <br>
+  
+  
+  <button type="submit">Enregistrer</button>
+</form>
+
+<a href="/reservations">Annuler</a>
+
+<%- include('../partials/footer') %>
