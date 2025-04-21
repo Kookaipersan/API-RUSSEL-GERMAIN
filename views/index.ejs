@@ -5,33 +5,33 @@
   <p class="lead">Gérez les catways, les réservations et les utilisateurs de notre port de plaisance en toute simplicité.</p>
 
   <!-- Formulaire d'enregistrement -->
-  <h2>Créer un utilisateur</h2>
-  <form action="/users/register" method="POST">
-    <div class="mb-3">
-      <label for="username" class="form-label">Nom d'utilisateur</label>
-      <input type="text" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" class="form-control" id="email" name="email" required>
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Mot de passe</label>
-      <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <button type="submit" class="btn btn-success">Créer le profil</button>
-  </form>
+<h2>Créer un utilisateur</h2>
+<form action="/users/register" method="POST" autocomplete="off">
+  <div class="mb-3">
+    <label for="username" class="form-label">Nom d'utilisateur</label>
+    <input type="text" class="form-control" id="username" name="username" required autocomplete="off">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" id="email" name="email" required autocomplete="off">
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Mot de passe</label>
+    <input type="password" class="form-control" id="password" name="password" required autocomplete="off">
+  </div>
+  <button type="submit" class="btn btn-success">Créer le profil</button>
+</form>
 
   <!-- Formulaire de connexion (géré côté JS) -->
   <h2 class="mt-5">Se connecter</h2>
   <form id="login-form">
     <div class="mb-3">
       <label for="login-email" class="form-label">Email</label>
-      <input type="email" class="form-control" id="login-email" required>
+      <input type="email" class="form-control" id="login-email" autocomplete="off" value="" required>
     </div>
     <div class="mb-3">
       <label for="login-password" class="form-label">Mot de passe</label>
-      <input type="password" class="form-control" id="login-password" required>
+      <input type="password" class="form-control" id="login-password" autocomplete="new-password" value="" required>
     </div>
     <button type="submit" class="btn btn-primary">Se connecter</button>
   </form>
@@ -49,7 +49,7 @@
     try {
       const response = await axios.post('/users/login', { email, password });
 
-      // ✅ Stocker le token dans un cookie (path=/ pour qu’il soit accessible partout)
+      //  Stocker le token dans un cookie (path=/ pour qu’il soit accessible partout)
       document.cookie = `token=${response.data.token}; path=/`;
 
       // Rediriger vers tableau de bord ou autre page protégée
@@ -57,6 +57,12 @@
     } catch (err) {
       alert('Erreur de connexion : ' + (err.response?.data?.message || 'Vérifie tes identifiants'));
     }
+  });
+
+  // Vider les champs email et mot de passe au chargement de la page
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
   });
 </script>
 
