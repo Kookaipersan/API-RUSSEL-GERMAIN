@@ -3,6 +3,7 @@ require("dotenv").config(); // Bien présent ici aussi (important si ce fichier 
 
 const connectDB = async () => {
   try {
+    console.log("ENV ENTIER", process.env); // <- ajoute ça tout en haut
     const uri = process.env.MONGODB_URI;
     console.log("URI de MongoDB:", uri); // ← ça aide à voir ce que Render reçoit
     await mongoose.connect(uri);
